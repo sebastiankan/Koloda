@@ -410,7 +410,7 @@ public class DraggableCardView: UIView, UIGestureRecognizerDelegate {
     }
     
     func animationRotationForDirection(_ direction: SwipeResultDirection) -> CGFloat {
-        return CGFloat(direction.bearing / 2.0 - Double.pi / 4)
+        return 0 //CGFloat(direction.bearing / 2.0 - Double.pi / 4)
     }
     
     private func swipeAction(_ direction: SwipeResultDirection) {
