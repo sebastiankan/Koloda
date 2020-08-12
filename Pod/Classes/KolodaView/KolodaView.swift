@@ -323,7 +323,9 @@ open class KolodaView: UIView, DraggableCardDelegate {
     func card(_ card: DraggableCardView, wasDraggedWithFinishPercentage percentage: CGFloat, inDirection direction: SwipeResultDirection) {
         
         if let shouldMove = delegate?.kolodaShouldMoveBackgroundCard(self), shouldMove {
-            self.moveOtherCardsWithPercentage(percentage)
+            if direction != .up {
+                self.moveOtherCardsWithPercentage(percentage)
+            }
         }
         delegate?.koloda(self, draggedCardWithPercentage: percentage, in: direction)
     }

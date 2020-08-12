@@ -16,6 +16,11 @@ public enum DragSpeed: TimeInterval {
     case fast = 0.4
 }
 
+enum LockDirection {
+    case vertical
+    case horizontal
+}
+
 protocol DraggableCardDelegate: class {
     
     func card(_ card: DraggableCardView, wasDraggedWithFinishPercentage percentage: CGFloat, inDirection direction: SwipeResultDirection)
@@ -37,6 +42,8 @@ private let defaultRotationAngle = CGFloat(Double.pi) / 10.0
 private let defaultScaleMin: CGFloat = 0.8
 
 private let screenSize = UIScreen.main.bounds.size
+
+var lockDirection: LockDirection?
 
 //Reset animation constants
 private let cardResetAnimationSpringBounciness: CGFloat = 10.0
@@ -240,23 +247,48 @@ public class DraggableCardView: UIView, UIGestureRecognizerDelegate {
             layer.shouldRasterize = true
             delegate?.card(cardPanBegan: self)
             
+            lockDirection = nil
+            
         case .changed:
-            let rotationStrength = min(dragDistance.x / frame.width, rotationMax)
-            let rotationAngle = animationDirectionY * self.rotationAngle * rotationStrength
-            let scaleStrength = 1 - ((1 - scaleMin) * abs(rotationStrength))
-            let scale = max(scaleStrength, scaleMin)
 
+            /// Lock to starter moving direction
+            if lockDirection == nil {
+                if dragDistance.x > layer.anchorPoint.x + 5 || dragDistance.x < layer.anchorPoint.x - 5 {
+                    lockDirection = .horizontal
+                } else if dragDistance.y > layer.anchorPoint.y + 5 || dragDistance.y < layer.anchorPoint.y - 5 {
+                    lockDirection = .vertical
+                }
+            }
+            
             var transform = CATransform3DIdentity
-            transform = CATransform3DScale(transform, scale, scale, 1)
-            transform = CATransform3DRotate(transform, rotationAngle, 0, 0, 1)
-            transform = CATransform3DTranslate(transform, dragDistance.x, dragDistance.y, 0)
+            var yTransform = dragDistance.y
+            if dragDistance.y < 0 || lockDirection != LockDirection.vertical {
+                yTransform = layer.anchorPoint.y
+            }
+            
+            var xTransform = dragDistance.x
+            if lockDirection != LockDirection.horizontal {
+                xTransform = layer.anchorPoint.x
+            }
+            
+            transform = CATransform3DTranslate(transform, xTransform, yTransform, 0)
             layer.transform = transform
             
-            let percentage = dragPercentage
-            updateOverlayWithFinishPercent(percentage, direction:dragDirection)
-            if let dragDirection = dragDirection {
-                //100% - for proportion
-                delegate?.card(self, wasDraggedWithFinishPercentage: min(abs(100 * percentage), 100), inDirection: dragDirection)
+            if ((dragDirection == SwipeResultDirection.left || dragDirection == SwipeResultDirection.right) && lockDirection == LockDirection.horizontal)
+            ||
+                (dragDirection == SwipeResultDirection.down && lockDirection == LockDirection.vertical)
+            {
+                
+                let percentage = dragPercentage
+                updateOverlayWithFinishPercent(percentage, direction:dragDirection)
+                
+                if let dragDirection = dragDirection {
+                    if dragDirection == .left || dragDirection == .right {
+                        print(lockDirection)
+                    }
+                    //100% - for proportion
+                    delegate?.card(self, wasDraggedWithFinishPercentage: min(abs(100 * percentage), 100), inDirection: dragDirection)
+                }
             }
             
         case .ended:
@@ -339,11 +371,18 @@ public class DraggableCardView: UIView, UIGestureRecognizerDelegate {
     }
     
     private func swipeMadeAction() {
-        let shouldSwipe = { direction in
-            return self.delegate?.card(self, shouldSwipeIn: direction) ?? true
-        }
-        if let dragDirection = dragDirection , shouldSwipe(dragDirection) && dragPercentage >= swipePercentageMargin && directions.contains(dragDirection) {
-            swipeAction(dragDirection)
+        if ((dragDirection == SwipeResultDirection.left || dragDirection == SwipeResultDirection.right) && lockDirection == LockDirection.horizontal)
+        ||
+            (dragDirection == SwipeResultDirection.down && lockDirection == LockDirection.vertical)
+        {
+            let shouldSwipe = { direction in
+                return self.delegate?.card(self, shouldSwipeIn: direction) ?? true
+            }
+            if let dragDirection = dragDirection , shouldSwipe(dragDirection) && dragPercentage >= swipePercentageMargin && directions.contains(dragDirection) {
+                swipeAction(dragDirection)
+            } else {
+                resetViewPositionAndTransformations()
+            }
         } else {
             resetViewPositionAndTransformations()
         }

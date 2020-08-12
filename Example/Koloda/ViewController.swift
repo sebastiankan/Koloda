@@ -66,6 +66,19 @@ extension ViewController: KolodaViewDelegate {
     func koloda(_ koloda: KolodaView, didSelectCardAt index: Int) {
         UIApplication.shared.openURL(URL(string: "https://yalantis.com/")!)
     }
+    
+    func koloda(_ koloda: KolodaView, shouldSwipeCardAt index: Int, in direction: SwipeResultDirection) -> Bool {
+        if direction == .up {
+            koloda.revertAction()
+            return false
+            
+        }
+        return true
+    }
+    
+    func koloda(_ koloda: KolodaView, allowedDirectionsForIndex index: Int) -> [SwipeResultDirection] {
+        return [.down, .up, .left, .right]
+    }
 
 }
 
