@@ -373,7 +373,7 @@ public class DraggableCardView: UIView, UIGestureRecognizerDelegate {
     private func swipeMadeAction() {
         if ((dragDirection == SwipeResultDirection.left || dragDirection == SwipeResultDirection.right) && lockDirection == LockDirection.horizontal)
         ||
-            (dragDirection == SwipeResultDirection.down && lockDirection == LockDirection.vertical)
+            ((dragDirection == SwipeResultDirection.down || dragDirection == SwipeResultDirection.up) && lockDirection == LockDirection.vertical)
         {
             let shouldSwipe = { direction in
                 return self.delegate?.card(self, shouldSwipeIn: direction) ?? true
