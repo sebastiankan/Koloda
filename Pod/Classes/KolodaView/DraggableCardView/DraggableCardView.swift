@@ -417,17 +417,19 @@ public class DraggableCardView: UIView, UIGestureRecognizerDelegate {
         overlayView?.overlayState = direction
         overlayView?.alpha = 1.0
         delegate?.card(self, wasSwipedIn: direction)
+        var duration = cardSwipeActionAnimationDuration
         if direction != .up {
-            let translationAnimation = POPBasicAnimation(propertyNamed: kPOPLayerTranslationXY)
-            translationAnimation?.duration = cardSwipeActionAnimationDuration
-            translationAnimation?.fromValue = NSValue(cgPoint: POPLayerGetTranslationXY(layer))
-            translationAnimation?.toValue = NSValue(cgPoint: animationPointForDirection(direction))
-            translationAnimation?.completionBlock = { _, _ in
-                self.removeFromSuperview()
-            }
-            layer.pop_add(translationAnimation, forKey: "swipeTranslationAnimation")
+            duration = 0
         }
-    }
+        let translationAnimation = POPBasicAnimation(propertyNamed: kPOPLayerTranslationXY)
+        translationAnimation?.duration = duration
+        translationAnimation?.fromValue = NSValue(cgPoint: POPLayerGetTranslationXY(layer))
+        translationAnimation?.toValue = NSValue(cgPoint: animationPointForDirection(direction))
+        translationAnimation?.completionBlock = { _, _ in
+            self.removeFromSuperview()
+        }
+        layer.pop_add(translationAnimation, forKey: "swipeTranslationAnimation")
+        }
     
     private func resetViewPositionAndTransformations() {
         delegate?.card(cardWasReset: self)
