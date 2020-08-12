@@ -414,10 +414,10 @@ public class DraggableCardView: UIView, UIGestureRecognizerDelegate {
     }
     
     private func swipeAction(_ direction: SwipeResultDirection) {
+        overlayView?.overlayState = direction
+        overlayView?.alpha = 1.0
+        delegate?.card(self, wasSwipedIn: direction)
         if direction != .up {
-            overlayView?.overlayState = direction
-            overlayView?.alpha = 1.0
-            delegate?.card(self, wasSwipedIn: direction)
             let translationAnimation = POPBasicAnimation(propertyNamed: kPOPLayerTranslationXY)
             translationAnimation?.duration = cardSwipeActionAnimationDuration
             translationAnimation?.fromValue = NSValue(cgPoint: POPLayerGetTranslationXY(layer))
