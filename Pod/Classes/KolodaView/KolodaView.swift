@@ -769,7 +769,7 @@ open class KolodaView: UIView, DraggableCardDelegate {
         }
         
         animationSemaphore.increment()
-        let currentItemsCount = countOfCards
+//        let currentItemsCount = countOfCards
         countOfCards = dataSource.kolodaNumberOfCards(self)
         let visibleIndexes = [Int](indexRange).filter { $0 >= currentCardIndex && $0 < currentCardIndex + countOfVisibleCards }
         if !visibleIndexes.isEmpty {
@@ -784,10 +784,10 @@ open class KolodaView: UIView, DraggableCardDelegate {
         }
         animationSemaphore.decrement()
         
-        assert(
-            currentItemsCount - indexRange.count == countOfCards,
-            "Cards count after update is not equal to data source count"
-        )
+//        assert(
+//            currentItemsCount - indexRange.count == countOfCards,
+//            "Cards count after update is not equal to data source count"
+//        )
     }
     
     // MARK: Cards managing - Reloading
