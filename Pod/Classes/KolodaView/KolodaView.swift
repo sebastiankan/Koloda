@@ -724,7 +724,7 @@ open class KolodaView: UIView, DraggableCardDelegate {
             return
         }
         
-//        let currentItemsCount = countOfCards
+        let currentItemsCount = countOfCards
         countOfCards = dataSource.kolodaNumberOfCards(self)
         
         let visibleIndexes = [Int](indexRange).filter { $0 >= currentCardIndex && $0 < currentCardIndex + countOfVisibleCards }
@@ -742,10 +742,10 @@ open class KolodaView: UIView, DraggableCardDelegate {
             )
         }
         
-//        assert(
-//            currentItemsCount + indexRange.count == countOfCards,
-//            "Cards count after update is not equal to data source count"
-//        )
+        assert(
+            currentItemsCount + indexRange.count == countOfCards,
+            "Cards count after update is not equal to data source count"
+        )
     }
     
     // MARK: Cards managing - Deletion
