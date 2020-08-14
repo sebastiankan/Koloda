@@ -151,7 +151,7 @@ open class KolodaView: UIView, DraggableCardDelegate {
     private lazy var _animator: KolodaViewAnimator = {
         return KolodaViewAnimator(koloda: self)
     }()
-    var visibleCards = [DraggableCardView]()
+    public var visibleCards = [DraggableCardView]()
 
     private var cardIsDragging: Bool {
         guard let frontCard = visibleCards.first else {
